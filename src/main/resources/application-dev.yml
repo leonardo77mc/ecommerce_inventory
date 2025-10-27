@@ -22,3 +22,9 @@ logging:
 
 server:
   port: 8090
+
+# External services configuration
+external:
+  product:
+    service:
+      url: http://localhost:8088
