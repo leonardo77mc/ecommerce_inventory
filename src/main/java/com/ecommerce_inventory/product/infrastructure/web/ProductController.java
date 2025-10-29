@@ -5,6 +5,10 @@ import com.ecommerce_inventory.product.application.UpdateProductStockUseCase;
 import com.ecommerce_inventory.product.infrastructure.external.ExternalProductDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -62,10 +66,47 @@ public class ProductController {
      * @return Updated product information or 404 if not found
      */
     @PutMapping("/{id}/stock")
-    @Operation(summary = "Update product stock", description = "Updates the stock of a product in the external microservice")
+    @Operation(
+        summary = "Update product stock", 
+        description = "Updates the stock quantity of a product in the external microservice. " +
+                     "This endpoint communicates with the external product service to modify the available stock."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200", 
+            description = "Product stock updated successfully",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ExternalProductDto.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "400", 
+            description = "Invalid request data (negative stock or invalid product ID)",
+            content = @Content
+        ),
+        @ApiResponse(
+            responseCode = "404", 
+            description = "Product not found in external service",
+            content = @Content
+        ),
+        @ApiResponse(
+            responseCode = "500", 
+            description = "Internal server error or external service unavailable",
+            content = @Content
+        )
+    })
     public ResponseEntity<ExternalProductDto> updateProductStock(
-            @Parameter(description = "Product ID", example = "1")
+            @Parameter(
+                description = "Product ID to update", 
+                example = "1",
+                required = true
+            )
             @PathVariable Long id,
+            @Parameter(
+                description = "Request body containing the new stock quantity",
+                required = true
+            )
             @Valid @RequestBody UpdateStockRequest request) {
         
         Optional<ExternalProductDto> updatedProduct = updateProductStockUseCase.execute(id, request.stock());
