@@ -70,7 +70,7 @@ external:
 
 ### 1. Clonar el repositorio
 ```bash
-git clone <repository-url>
+git clone <https://github.com/leonardo77mc/ecommerce_inventory.git>
 cd ecommerce_inventory
 ```
 
